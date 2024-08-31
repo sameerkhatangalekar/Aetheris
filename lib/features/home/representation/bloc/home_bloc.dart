@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:aetheris/core/common/params.dart';
 import 'package:aetheris/features/home/domain/entity/weather_entity.dart';
 import 'package:aetheris/features/home/domain/usecases/get_current_weather_by_lat_long.dart';
@@ -19,6 +21,7 @@ EventTransformer<T> debounce<T>(Duration duration) {
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetCurrentWeatherByLocationUsecase _getCurrentWeatherForecastByLocation;
   final GetCurrentWeatherByLatLongUsecase _getCurrentWeatherByLatLongUsecase;
+  StreamSubscription? _service;
 
   HomeBloc({
     required GetCurrentWeatherByLocationUsecase
@@ -31,7 +34,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         super(const HomeInitial()) {
     on<CurrentWeatherRequestedEvent>((event, emit) async {
       emit(const CurrentWeatherDataLoadingState());
-
 
       if (event.location != null && event.location!.isNotEmpty) {
         final result = await _getCurrentWeatherForecastByLocation(
@@ -46,13 +48,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             CurrentWeatherDataLoadedState(currentWeather: r),
           ),
         );
-      }
-      else {
-
+      } else {
         final isServiceEnabled = await Geolocator.isLocationServiceEnabled();
         final hasPermission = await Geolocator.checkPermission();
-        if (isServiceEnabled && (hasPermission == LocationPermission.always ||hasPermission == LocationPermission.whileInUse) ) {
-
+        if (isServiceEnabled &&
+            (hasPermission == LocationPermission.always ||
+                hasPermission == LocationPermission.whileInUse)) {
           const LocationSettings locationSettings = LocationSettings(
             accuracy: LocationAccuracy.high,
             distanceFilter: 100,
@@ -76,13 +77,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             ),
           );
         } else {
-
           emit(
-            const CurrentWeatherDataLoadingFailedState(message: 'Location service is required to get current location weather'),
+            const CurrentWeatherDataLoadingFailedState(
+                message:
+                    'Location service is required to get current location weather'),
           );
         }
       }
     }, transformer: debounce(const Duration(milliseconds: 400)));
+
+    _service = Geolocator.getServiceStatusStream().listen((data) {
+      if (data == ServiceStatus.enabled) {
+        add(const CurrentWeatherRequestedEvent());
+      }
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _service?.cancel();
+    return super.close();
   }
 
   @override
