@@ -1,6 +1,8 @@
 import 'dart:async';
-
+import 'package:aetheris/core/utils/extension.dart';
+import 'package:flutter/foundation.dart';
 import 'package:aetheris/core/common/params.dart';
+
 import 'package:aetheris/features/home/domain/entity/weather_entity.dart';
 import 'package:aetheris/features/home/domain/usecases/get_current_weather_by_lat_long.dart';
 import 'package:aetheris/features/home/domain/usecases/get_current_weather_by_location.dart';
@@ -32,40 +34,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             getCurrentWeatherByLocationUsecase,
         _getCurrentWeatherByLatLongUsecase = getCurrentWeatherByLatLongUsecase,
         super(const HomeInitial()) {
-    on<CurrentWeatherRequestedEvent>((event, emit) async {
-      emit(const CurrentWeatherDataLoadingState());
+    on<CurrentWeatherRequestedEvent>(
+      (event, emit) async {
+        emit(const CurrentWeatherDataLoadingState());
 
-      if (event.location != null && event.location!.isNotEmpty) {
-        final result = await _getCurrentWeatherForecastByLocation(
-          LocationParams(location: event.location!),
-        );
-
-        result.fold(
-          (l) => emit(
-            CurrentWeatherDataLoadingFailedState(message: l.message),
-          ),
-          (r) => emit(
-            CurrentWeatherDataLoadedState(currentWeather: r),
-          ),
-        );
-      } else {
-        final isServiceEnabled = await Geolocator.isLocationServiceEnabled();
-        final hasPermission = await Geolocator.checkPermission();
-        if (isServiceEnabled &&
-            (hasPermission == LocationPermission.always ||
-                hasPermission == LocationPermission.whileInUse)) {
-          const LocationSettings locationSettings = LocationSettings(
-            accuracy: LocationAccuracy.high,
-            distanceFilter: 100,
-          );
-
-          Position position = await Geolocator.getCurrentPosition(
-            locationSettings: locationSettings,
-          );
-
-          final result = await _getCurrentWeatherByLatLongUsecase(
-            LatLongParams(
-                latitude: position.latitude, longitude: position.longitude),
+        if (event.location != null && event.location!.isNotEmpty) {
+          final result = await _getCurrentWeatherForecastByLocation(
+            LocationParams(location: event.location!),
           );
 
           result.fold(
@@ -77,14 +52,46 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             ),
           );
         } else {
-          emit(
-            const CurrentWeatherDataLoadingFailedState(
-                message:
-                    'Location service is required to get current location weather'),
-          );
+          final isServiceEnabled = await Geolocator.isLocationServiceEnabled();
+          final hasPermission = await Geolocator.checkPermission();
+          if (isServiceEnabled &&
+              (hasPermission == LocationPermission.always ||
+                  hasPermission == LocationPermission.whileInUse)) {
+            const LocationSettings locationSettings = LocationSettings(
+              accuracy: LocationAccuracy.high,
+              distanceFilter: 100,
+            );
+
+            Position position = await Geolocator.getCurrentPosition(
+              locationSettings: locationSettings,
+            );
+
+            final result = await _getCurrentWeatherByLatLongUsecase(
+              LatLongParams(
+                  latitude: position.latitude, longitude: position.longitude),
+            );
+
+            result.fold(
+              (l) => emit(
+                CurrentWeatherDataLoadingFailedState(message: l.message),
+              ),
+              (r) => emit(
+                CurrentWeatherDataLoadedState(currentWeather: r),
+              ),
+            );
+          } else {
+            emit(
+              const CurrentWeatherDataLoadingFailedState(
+                  message:
+                      'Location service is required to get current location weather'),
+            );
+          }
         }
-      }
-    }, transformer: debounce(const Duration(milliseconds: 400)));
+      },
+      transformer: debounce(
+        const Duration(milliseconds: 400),
+      ),
+    );
 
     _service = Geolocator.getServiceStatusStream().listen((data) {
       if (data == ServiceStatus.enabled) {

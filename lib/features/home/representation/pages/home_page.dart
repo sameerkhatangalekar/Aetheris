@@ -221,7 +221,7 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: Colors.grey.shade900.withOpacity(0.5),
+                color: Colors.grey.shade900.withOpacity(0.6),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -264,7 +264,7 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: Colors.grey.shade900.withOpacity(0.5),
+                color: Colors.grey.shade900.withOpacity(0.6),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

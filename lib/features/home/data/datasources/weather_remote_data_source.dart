@@ -25,7 +25,6 @@ final class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
     try {
       final result = await _dio.get(
           'https://api.weatherapi.com/v1/forecast.json?key=$weatherApiKey&q=$latitude,$longitude&days=3&aqi=yes&alerts=no');
-      WeatherModel.fromJson(result.data).log();
       return WeatherModel.fromJson(result.data);
     } on DioException catch (e) {
       throw ServerException(message: dioErrorProcessor(e));
@@ -37,7 +36,6 @@ final class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
     try {
       final result = await _dio.get(
           'https://api.weatherapi.com/v1/forecast.json?key=$weatherApiKey&q=$location&days=3&aqi=yes&alerts=no');
-      WeatherModel.fromJson(result.data).log();
       return WeatherModel.fromJson(result.data);
     } on DioException catch (e) {
       throw ServerException(message: dioErrorProcessor(e));

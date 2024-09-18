@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static final ThemeData theme = ThemeData(
     scaffoldBackgroundColor: Palette.scaffoldBackgroundColor,
-    appBarTheme: AppBarTheme(
-      iconTheme: const IconThemeData(color: Colors.white),
+    appBarTheme: const AppBarTheme(
+      iconTheme: IconThemeData(color: Colors.white),
       color: Palette.scaffoldBackgroundColor,
-      titleTextStyle: const TextStyle(color: Colors.white),
+      titleTextStyle: TextStyle(color: Colors.white),
     ),
     inputDecorationTheme: InputDecorationTheme(
       isDense: true,
@@ -46,8 +46,8 @@ class AppTheme {
 }
 
 class Palette {
-  static final scaffoldBackgroundColor = Colors.grey.shade900.withOpacity(0.1);
-  static final backgroundColor = Colors.grey.shade900.withOpacity(0.4);
+  static const scaffoldBackgroundColor = Colors.black;
+  static final backgroundColor = Colors.grey.shade900;
   static const titleColor = Colors.white;
   static const subTitleColor = Colors.white54;
 }

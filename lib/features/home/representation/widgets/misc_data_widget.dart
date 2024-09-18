@@ -27,7 +27,7 @@ class MiscDataWidget extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        color: Colors.grey.shade900.withOpacity(0.5),
+        color:Colors.grey.shade900.withOpacity(0.6),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
