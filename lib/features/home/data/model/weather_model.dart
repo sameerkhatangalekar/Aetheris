@@ -424,7 +424,7 @@ class DayModel extends DayEntity {
             ? null
             : ConditionModel.fromJson(json["condition"]),
         uv: json["uv"]?.toDouble(),
-        airQuality: Map.from(json["air_quality"]!)
+        airQuality: json["air_quality"] == null ? null : Map.from(json["air_quality"])
             .map((k, v) => MapEntry<String, double>(k, v?.toDouble())),
       );
 
@@ -583,7 +583,7 @@ class HourModel extends HourEntity {
         gustMph: json["gust_mph"]?.toDouble(),
         gustKph: json["gust_kph"]?.toDouble(),
         uv: json["uv"]?.toDouble(),
-        airQuality: Map.from(json["air_quality"]!)
+        airQuality: json["air_quality"] == null ? null : Map.from(json["air_quality"])
             .map((k, v) => MapEntry<String, double>(k, v?.toDouble())),
         shortRad: json["short_rad"]?.toDouble(),
         diffRad: json["diff_rad"]?.toDouble(),
